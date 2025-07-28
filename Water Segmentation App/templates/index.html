@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Water Segmentation App 💧</title>
+  <style>
+    body {
+      background: linear-gradient(120deg, #a1c4fd, #c2e9fb);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+      padding: 50px 20px;
+      margin: 0;
+    }
+
+    .container {
+      background: white;
+      width: 100%;
+      max-width: 800px;
+      margin: auto;
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      color: #0077b6;
+      margin-bottom: 30px;
+    }
+
+    form {
+      margin-bottom: 30px;
+    }
+
+    input[type="file"] {
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 15px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 12px 30px;
+      background-color: #00b4d8;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0077b6;
+    }
+
+    .spinner {
+      display: none;
+      margin: 30px auto;
+      width: 50px;
+      height: 50px;
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #00b4d8;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    #loadingText {
+      display: none;
+      color: #0077b6;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .image-preview-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .image-preview-container img {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      transition: opacity 0.5s ease-in-out;
+    }
+
+    .hidden {
+      opacity: 0;
+    }
+
+    /* Slider specific */
+    .slider-container {
+      position: relative;
+      max-width: 100%;
+      margin-top: 40px;
+    }
+
+    .ba-slider {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      cursor: ew-resize;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    }
+
+    .ba-slider img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .ba-slider .resize {
+      position: absolute;
+      top: 0;
+      left: 0;
+      overflow: hidden;
+      width: 50%;
+      height: 100%;
+    }
+
+    .ba-slider .resize img {
+      display: block;
+    }
+
+    .ba-slider .handle {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 4px;
+      height: 100%;
+      background: #00b4d8;
+      cursor: ew-resize;
+    }
+
+    @media (max-width: 768px) {
+      .image-preview-container {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Water Segmentation App 💧</h1>
+
+    <form method="POST" enctype="multipart/form-data" onsubmit="showSpinner()">
+      <input type="file" name="image" accept="image/*" onchange="previewImage(event)" required><br>
+      <button type="submit">Upload and Segment</button>
+    </form>
+
+    <div class="spinner" id="loadingSpinner"></div>
+    <p id="loadingText">Processing image... Please wait ⏳</p>
+
+    <div class="image-preview-container">
+      <img id="previewImage" style="display: none;" alt="Original Preview"/>
+
+      {% if result and pred_result %}
+      <!-- Original Image Container -->
+      <div>
+        <p><strong>Original Image</strong></p>
+        <img src="{{ result }}" alt="Original Uploaded Image" class="hidden" onload="this.classList.remove('hidden')">
+      </div>
+
+      <!-- Predicted Mask Container -->
+      <div>
+        <p><strong>Predicted Segmentation</strong></p>
+        <img src="{{ pred_result }}" alt="Predicted Mask" class="hidden" onload="this.classList.remove('hidden')">
+      </div>
+
+      <!-- Slider Comparison -->
+      <div class="slider-container">
+        <p><strong>Comparison Slider</strong></p>
+        <div class="ba-slider" id="ba-slider">
+          <img src="{{ result }}" alt="Original Image" />
+          <div class="resize">
+            <img src="{{ pred_result }}" alt="Prediction Image" />
+          </div>
+          <div class="handle"></div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <script>
+    function showSpinner() {
+      document.getElementById("loadingSpinner").style.display = "block";
+      document.getElementById("loadingText").style.display = "block";
+    }
+
+    function previewImage(event) {
+      const preview = document.getElementById('previewImage');
+      const file = event.target.files[0];
+      if (file) {
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = 'block';
+      }
+    }
+
+    // Comparison Slider Logic
+    window.addEventListener("load", function () {
+      const slider = document.getElementById("ba-slider");
+      if (!slider) return;
+
+      const resize = slider.querySelector(".resize");
+      const handle = slider.querySelector(".handle");
+
+      slider.addEventListener("mousemove", function (e) {
+        const rect = slider.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const width = slider.offsetWidth;
+        const percent = Math.max(0, Math.min(1, x / width));
+        handle.style.left = `${percent * 100}%`;
+        resize.style.width = `${percent * 100}%`;
+      });
+    });
+  </script>
+</body>
+</html>
