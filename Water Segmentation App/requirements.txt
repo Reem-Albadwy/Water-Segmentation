@@ -1,6 +1,6 @@
 flask
 tensorflow
-gdown
+requests
 numpy
 opencv-python
 gunicorn
