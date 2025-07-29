@@ -18,6 +18,7 @@ os.makedirs(PREDICTED_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['PREDICTED_FOLDER'] = PREDICTED_FOLDER
 
+MODEL_URL="https://huggingface.co/Reem1/Segmentation_Feature_Extraction.h5/resolve/main/Segmentation_Feature_Extraction.h5"
 if not os.path.exists(MODEL_PATH):
     response = requests.get(MODEL_URL)
     with open(MODEL_PATH, 'wb') as f:
