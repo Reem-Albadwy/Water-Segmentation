@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 import os
 import numpy as np
 import requests
+import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.layers import Dropout
 from tensorflow.keras.utils import get_custom_objects
