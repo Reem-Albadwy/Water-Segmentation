@@ -7,6 +7,7 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.layers import Dropout
 from tensorflow.keras.utils import get_custom_objects
 from tensorflow.keras.activations import swish
+from PIL import Image
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 import cv2
 
