@@ -89,6 +89,7 @@ def index():
 
             # Extract RGB for display
             rgb = img[:, :, [3, 2, 1]]
+            rgb = rgb.astype(np.uint8)
             rgb_bgr = cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR)
             rgb_path = os.path.join(PROCESSED_FOLDER, 'rgb_image.png')
             cv2.imwrite(rgb_path, rgb_bgr)
