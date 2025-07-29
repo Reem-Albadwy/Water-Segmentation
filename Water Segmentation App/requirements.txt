@@ -2,7 +2,7 @@ flask
 tensorflow
 requests
 numpy
-opencv-python
+opencv-python-headless
 gunicorn
 Pillow
 
