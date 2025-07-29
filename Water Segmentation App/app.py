@@ -35,7 +35,6 @@ if not os.path.exists(MODEL_PATH):
         
 model = load_model(MODEL_PATH, compile=False, custom_objects={'swish': tf.nn.swish, 'FixedDropout': FixedDropout})
 
-@app.route('/', methods=['GET', 'POST'])
 def calculate_water_index(img):
     R = img[:, :, 3].astype(np.float32)
     G = img[:, :, 2].astype(np.float32)
@@ -43,6 +42,7 @@ def calculate_water_index(img):
     water_index = (G - R) / (G + R + 1e-5)
     return np.expand_dims(water_index, axis=-1)
 
+@app.route('/', methods=['GET', 'POST'])
 def index():
     result = None
     pred_result = None
