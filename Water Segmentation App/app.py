@@ -3,6 +3,7 @@ import os
 import numpy as np
 import requests
 from tensorflow.keras.models import load_model
+from tensorflow.keras.activations import swish
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 import cv2
 
@@ -24,7 +25,7 @@ if not os.path.exists(MODEL_PATH):
     with open(MODEL_PATH, 'wb') as f:
         f.write(response.content)
         
-model = load_model(MODEL_PATH, compile=False)
+model = load_model(MODEL_PATH, compile=False, custom_objects={'swish': swish})
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
