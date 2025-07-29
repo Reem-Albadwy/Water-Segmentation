@@ -10,6 +10,7 @@ from tensorflow.keras.activations import swish
 from PIL import Image
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 import cv2
+import tifffile as tiff
 
 app = Flask(__name__)
 
@@ -55,7 +56,7 @@ def index():
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
 
-            img = np.array(Image.open(filepath))
+            img = tiff.imread(filepath)
             water_index = calculate_water_index(img)
             img = np.concatenate([img, water_index], axis=-1)  # (128,128,13)
             img = np.expand_dims(img, axis=0)  # (1,128,128,13)
