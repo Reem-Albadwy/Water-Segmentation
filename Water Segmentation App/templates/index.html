@@ -163,35 +163,32 @@
     <p id="loadingText">Processing image... Please wait ⏳</p>
 
     <div class="image-preview-container">
-      <img id="previewImage" style="display: none;" alt="Original Preview"/>
+      {if % rgb_result and true_mask and pred_result %}
 
-      {% if result and pred_result %}
-      <!-- Original Image Container -->
+      #..... RGB Preview Of Original Image
       <div>
-        <p><strong>Original Image</strong></p>
-        <img src="{{ result }}" alt="Original Uploaded Image" class="hidden" onload="this.classList.remove('hidden')">
+        <p><strong>RGB View of Original Image</strong></p>
+        <img src="{{ rgb_result }}" alt="RGB Image" class="hidden" onload="this.classList.remove('hidden')">
       </div>
 
-      <!-- Predicted Mask Container -->
+      #..... True Mask
       <div>
-        <p><strong>Predicted Segmentation</strong></p>
+        <p><strong>True Mask</strong></p>
+        <img src="{{ true_mask }}" alt="True Mask" class="hidden" onload="this.classList.remove('hidden')">
+      </div>
+
+      #..... Predicted Mask
+      <div>
+        <p><strong>Predicted Mask</strong></p>
         <img src="{{ pred_result }}" alt="Predicted Mask" class="hidden" onload="this.classList.remove('hidden')">
       </div>
 
-      <!-- Slider Comparison -->
-      <div class="slider-container">
-        <p><strong>Comparison Slider</strong></p>
-        <div class="ba-slider" id="ba-slider">
-          <img src="{{ result }}" alt="Original Image" />
-          <div class="resize">
-            <img src="{{ pred_result }}" alt="Prediction Image" />
-          </div>
-          <div class="handle"></div>
-        </div>
+      #..... Accuracy Score
+      <div style="margin-top: 20px;">
+        <p><strong>Similarity Score:</strong> {{ similarity_score }}%</p>
       </div>
-      {% endif %}
+      { % endif % }
     </div>
-  </div>
 
   <script>
     function showSpinner() {
@@ -208,23 +205,6 @@
       }
     }
 
-    // Comparison Slider Logic
-    window.addEventListener("load", function () {
-      const slider = document.getElementById("ba-slider");
-      if (!slider) return;
-
-      const resize = slider.querySelector(".resize");
-      const handle = slider.querySelector(".handle");
-
-      slider.addEventListener("mousemove", function (e) {
-        const rect = slider.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const width = slider.offsetWidth;
-        const percent = Math.max(0, Math.min(1, x / width));
-        handle.style.left = `${percent * 100}%`;
-        resize.style.width = `${percent * 100}%`;
-      });
-    });
   </script>
 </body>
 </html>
