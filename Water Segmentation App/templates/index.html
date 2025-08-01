@@ -5,16 +5,17 @@
   <title>Water Segmentation App 💧</title>
   <style>
     body {
-      background: #e8f0fe;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      text-align: center;
-      padding: 50px 20px;
       margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
     }
 
     h1 {
-      color: #0077b6;
-      margin-bottom: 30px;
+      margin: 30px 0;
+      color: #00c6ff;
     }
 
     form {
@@ -45,14 +46,18 @@
     }
 
     .spinner {
-      display: none;
-      margin: 30px auto;
-      width: 50px;
-      height: 50px;
+      position: absolute;
+      top: 20%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 60px;
+      height: 60px;
       border: 6px solid #f3f3f3;
       border-top: 6px solid #00b4d8;
       border-radius: 50%;
       animation: spin 1s linear infinite;
+      opacity: 0.4;
+      z-index: 10;
     }
 
     @keyframes spin {
@@ -60,11 +65,21 @@
       100% { transform: rotate(360deg); }
     }
 
-    #loadingText {
-      display: none;
-      color: #0077b6;
-      font-weight: bold;
-      margin-top: 10px;
+    .progress-container {
+      margin-top: 100px;
+      width: 60%;
+      margin-left: auto;
+      margin-right: auto;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 20px;
+      width: 0%;
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      transition: width 2s ease;
     }
 
     .image-preview-container {
@@ -80,7 +95,12 @@
       max-height: 300px;
       border-radius: 12px;
       box-shadow: 0 0 15px rgba(0,0,0,0.2);
-      transition: opacity 0.5s ease-in-out;
+      opacity: 0;
+      animation: fadeIn 2s ease-in forwards;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
     }
 
     .image-column {
@@ -119,16 +139,19 @@
   </form>
 
   <div class="spinner" id="loadingSpinner"></div>
-  <p id="loadingText">Processing image... Please wait ⏳</p>
+
+  <div class="progress-container">
+    <div class="progress-bar" id="progress-bar"></div>
+  </div>
 
   {% if rgb_result and pred_result %}
   <div class="image-preview-container">
     <div class="image-column">
-      <p><strong>RGB View of Original Image</strong></p>
+      <p><strong>Original Image</strong></p>
       <img src="{{ rgb_result }}" alt="RGB Image">
     </div>
     <div class="image-column">
-      <p><strong>Detected Water Regions</strong></p>
+      <p><strong>Predicted Image</strong></p>
       <img src="{{ pred_result }}" alt="Predicted Mask">
       <a href="{{ pred_result }}" class="download-btn" download>⬇ Download Mask</a>
     </div>
@@ -138,7 +161,11 @@
   <script>
     function showSpinner() {
       document.getElementById("loadingSpinner").style.display = "block";
-      document.getElementById("loadingText").style.display = "block";
+      document.getElementById("progress-bar").style.width = "0%";
+
+      setTimeout(() => {
+        document.getElementById("progress-bar").style.width = "100%";
+      }, 500);
     }
   </script>
 </body>
