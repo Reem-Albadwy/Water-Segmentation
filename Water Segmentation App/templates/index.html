@@ -97,27 +97,6 @@
       opacity: 0;
     }
 
-    .slider-container {
-      position: relative;
-      max-width: 100%;
-      margin-top: 40px;
-    }
-
-    .ba-slider {
-      position: relative;
-      width: 100%;
-      height: auto;
-      overflow: hidden;
-      cursor: ew-resize;
-      border-radius: 12px;
-    }
-
-    .ba-slider img {
-      display: block;
-      width: 100%;
-      height: auto;
-    }
-
     .resize {
       position: absolute;
       top: 0;
@@ -175,23 +154,6 @@
         <img src="{{ pred_result }}" alt="Predicted Mask">
       </div>
     </div>
-
-    <div class="slider-container">
-      <p><strong>Compare Original vs Predicted</strong></p>
-      <div class="ba-slider" id="slider">
-        <img src="{{ rgb_result }}" alt="Original">
-        <div class="resize" id="resize">
-          <img src="{{ pred_result }}" alt="Mask">
-        </div>
-        <div class="handle" id="handle"></div>
-      </div>
-    </div>
-
-    <div style="margin-top: 20px;">
-      {% if iou_score %}
-      <p><strong>Similarity Score:</strong> {{ iou_score }}%</p>
-      {% endif %}
-    </div>
     {% endif %}
   </div>
 
@@ -200,32 +162,6 @@
       document.getElementById("loadingSpinner").style.display = "block";
       document.getElementById("loadingText").style.display = "block";
     }
-
-    window.onload = function () {
-      const slider = document.getElementById("slider");
-      const handle = document.getElementById("handle");
-      const resize = document.getElementById("resize");
-
-      let isDown = false;
-
-      handle.addEventListener("mousedown", function () {
-        isDown = true;
-      });
-
-      window.addEventListener("mouseup", function () {
-        isDown = false;
-      });
-
-      window.addEventListener("mousemove", function (e) {
-        if (!isDown) return;
-        let bounds = slider.getBoundingClientRect();
-        let x = e.clientX - bounds.left;
-        if (x < 0) x = 0;
-        if (x > bounds.width) x = bounds.width;
-        handle.style.left = x + "px";
-        resize.style.width = x + "px";
-      });
-    };
   </script>
 </body>
 </html>
