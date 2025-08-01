@@ -83,6 +83,10 @@
       transition: opacity 0.5s ease-in-out;
     }
 
+    .image-column {
+      text-align: center;
+    }
+
     .download-btn {
       margin-top: 15px;
       display: inline-block;
@@ -119,12 +123,12 @@
 
   {% if rgb_result and pred_result %}
   <div class="image-preview-container">
-    <div>
+    <div class="image-column">
       <p><strong>RGB View of Original Image</strong></p>
       <img src="{{ rgb_result }}" alt="RGB Image">
     </div>
-    <div>
-      <p><strong>Predicted Mask</strong></p>
+    <div class="image-column">
+      <p><strong>Detected Water Regions</strong></p>
       <img src="{{ pred_result }}" alt="Predicted Mask">
       <a href="{{ pred_result }}" class="download-btn" download>⬇ Download Mask</a>
     </div>
