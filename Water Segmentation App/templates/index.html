@@ -97,7 +97,6 @@
       opacity: 0;
     }
 
-    /* Slider specific */
     .slider-container {
       position: relative;
       max-width: 100%;
@@ -107,10 +106,10 @@
     .ba-slider {
       position: relative;
       width: 100%;
+      height: auto;
       overflow: hidden;
       cursor: ew-resize;
       border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
     }
 
     .ba-slider img {
@@ -119,27 +118,30 @@
       height: auto;
     }
 
-    .ba-slider .resize {
+    .resize {
       position: absolute;
       top: 0;
       left: 0;
-      overflow: hidden;
-      width: 50%;
       height: 100%;
+      width: 50%;
+      overflow: hidden;
     }
 
-    .ba-slider .resize img {
+    .resize img {
       display: block;
+      width: 100%;
+      height: auto;
     }
 
-    .ba-slider .handle {
+    .handle {
       position: absolute;
       top: 0;
       left: 50%;
-      width: 4px;
+      width: 6px;
       height: 100%;
       background: #00b4d8;
       cursor: ew-resize;
+      z-index: 10;
     }
 
     @media (max-width: 768px) {
@@ -155,36 +157,43 @@
     <h1>Water Segmentation App 💧</h1>
 
     <form method="POST" enctype="multipart/form-data" onsubmit="showSpinner()">
-      <input type="file" name="image" accept="image/*" onchange="previewImage(event)" required><br>
+      <input type="file" name="image" accept="image/*" required><br>
       <button type="submit">Upload and Segment</button>
     </form>
 
     <div class="spinner" id="loadingSpinner"></div>
     <p id="loadingText">Processing image... Please wait ⏳</p>
 
+    {% if rgb_result and pred_result %}
     <div class="image-preview-container">
-      {% if rgb_result and pred_result %}
-
-      <!-- RGB Preview Of Original Image -->
       <div>
         <p><strong>RGB View of Original Image</strong></p>
-        <img src="{{ rgb_result }}" alt="RGB Image" class="hidden" onload="this.classList.remove('hidden')">
+        <img src="{{ rgb_result }}" alt="RGB Image">
       </div>
-
-      <!-- Predicted Mask -->
       <div>
         <p><strong>Predicted Mask</strong></p>
-        <img src="{{ pred_result }}" alt="Predicted Mask" class="hidden" onload="this.classList.remove('hidden')">
+        <img src="{{ pred_result }}" alt="Predicted Mask">
       </div>
+    </div>
 
-      <!-- Accuracy Score -->
-      <div style="margin-top: 20px;">
-        {% if iou_score %}
-        <p><strong>Similarity Score:</strong> {{ iou_score }}%</p>
-        {% endif %}
+    <div class="slider-container">
+      <p><strong>Compare Original vs Predicted</strong></p>
+      <div class="ba-slider" id="slider">
+        <img src="{{ rgb_result }}" alt="Original">
+        <div class="resize" id="resize">
+          <img src="{{ pred_result }}" alt="Mask">
+        </div>
+        <div class="handle" id="handle"></div>
       </div>
+    </div>
+
+    <div style="margin-top: 20px;">
+      {% if iou_score %}
+      <p><strong>Similarity Score:</strong> {{ iou_score }}%</p>
       {% endif %}
     </div>
+    {% endif %}
+  </div>
 
   <script>
     function showSpinner() {
@@ -192,15 +201,31 @@
       document.getElementById("loadingText").style.display = "block";
     }
 
-    function previewImage(event) {
-      const preview = document.getElementById('previewImage');
-      const file = event.target.files[0];
-      if (file) {
-        preview.src = URL.createObjectURL(file);
-        preview.style.display = 'block';
-      }
-    }
+    window.onload = function () {
+      const slider = document.getElementById("slider");
+      const handle = document.getElementById("handle");
+      const resize = document.getElementById("resize");
 
+      let isDown = false;
+
+      handle.addEventListener("mousedown", function () {
+        isDown = true;
+      });
+
+      window.addEventListener("mouseup", function () {
+        isDown = false;
+      });
+
+      window.addEventListener("mousemove", function (e) {
+        if (!isDown) return;
+        let bounds = slider.getBoundingClientRect();
+        let x = e.clientX - bounds.left;
+        if (x < 0) x = 0;
+        if (x > bounds.width) x = bounds.width;
+        handle.style.left = x + "px";
+        resize.style.width = x + "px";
+      });
+    };
   </script>
 </body>
 </html>
