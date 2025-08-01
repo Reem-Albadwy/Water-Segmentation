@@ -12,16 +12,6 @@
       margin: 0;
     }
 
-    .container {
-      background: white;
-      width: 100%;
-      max-width: 800px;
-      margin: auto;
-      padding: 40px 30px;
-      border-radius: 20px;
-      box-shadow: 0 0 25px rgba(0, 0, 0, 0.1);
-    }
-
     h1 {
       color: #0077b6;
       margin-bottom: 30px;
@@ -81,7 +71,7 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 20px;
+      gap: 30px;
       margin-top: 30px;
     }
 
@@ -93,34 +83,19 @@
       transition: opacity 0.5s ease-in-out;
     }
 
-    .hidden {
-      opacity: 0;
+    .download-btn {
+      margin-top: 15px;
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #0096c7;
+      color: white;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
     }
 
-    .resize {
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 100%;
-      width: 50%;
-      overflow: hidden;
-    }
-
-    .resize img {
-      display: block;
-      width: 100%;
-      height: auto;
-    }
-
-    .handle {
-      position: absolute;
-      top: 0;
-      left: 50%;
-      width: 6px;
-      height: 100%;
-      background: #00b4d8;
-      cursor: ew-resize;
-      z-index: 10;
+    .download-btn:hover {
+      background-color: #0077b6;
     }
 
     @media (max-width: 768px) {
@@ -132,30 +107,29 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Water Segmentation App 💧</h1>
+  <h1>Water Segmentation App 💧</h1>
 
-    <form method="POST" enctype="multipart/form-data" onsubmit="showSpinner()">
-      <input type="file" name="image" accept="image/*" required><br>
-      <button type="submit">Upload and Segment</button>
-    </form>
+  <form method="POST" enctype="multipart/form-data" onsubmit="showSpinner()">
+    <input type="file" name="image" accept="image/*" required><br>
+    <button type="submit">Upload and Segment</button>
+  </form>
 
-    <div class="spinner" id="loadingSpinner"></div>
-    <p id="loadingText">Processing image... Please wait ⏳</p>
+  <div class="spinner" id="loadingSpinner"></div>
+  <p id="loadingText">Processing image... Please wait ⏳</p>
 
-    {% if rgb_result and pred_result %}
-    <div class="image-preview-container">
-      <div>
-        <p><strong>RGB View of Original Image</strong></p>
-        <img src="{{ rgb_result }}" alt="RGB Image">
-      </div>
-      <div>
-        <p><strong>Predicted Mask</strong></p>
-        <img src="{{ pred_result }}" alt="Predicted Mask">
-      </div>
+  {% if rgb_result and pred_result %}
+  <div class="image-preview-container">
+    <div>
+      <p><strong>RGB View of Original Image</strong></p>
+      <img src="{{ rgb_result }}" alt="RGB Image">
     </div>
-    {% endif %}
+    <div>
+      <p><strong>Predicted Mask</strong></p>
+      <img src="{{ pred_result }}" alt="Predicted Mask">
+      <a href="{{ pred_result }}" class="download-btn" download>⬇ Download Mask</a>
+    </div>
   </div>
+  {% endif %}
 
   <script>
     function showSpinner() {
