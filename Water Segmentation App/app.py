@@ -74,6 +74,7 @@ def index():
 
             pred_filename = 'pred_' + filename.rsplit('.', 1)[0] + '.png'
             pred_result = os.path.join('static/predicted', pred_filename)
+            pred_path = os.path.join(PREDICTED_FOLDER, pred_filename)
             cv2.imwrite(pred_path, prediction_resized)
 
             # Extract RGB for display
@@ -90,8 +91,8 @@ def index():
             return render_template(
                 "index.html",
                 result=filepath,
-                pred_result=pred_path,
-                rgb_result=rgb_path,
+                pred_result=pred_res,
+                rgb_result=rgb_res,
             )
     return render_template("index.html")
 
