@@ -73,7 +73,7 @@ def index():
             prediction_resized = cv2.resize(prediction_binary, (128, 128))
 
             pred_filename = 'pred_' + filename.rsplit('.', 1)[0] + '.png'
-            pred_path = os.path.join(PREDICTED_FOLDER, pred_filename)
+            pred_result = os.path.join('static/predicted', pred_filename)
             cv2.imwrite(pred_path, prediction_resized)
 
             # Extract RGB for display
@@ -82,7 +82,9 @@ def index():
             rgb = (rgb * 255).astype(np.uint8)
 
             rgb_bgr = cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR)
-            rgb_path = os.path.join(PROCESSED_FOLDER, 'rgb_image.png')
+            rgb_filename = 'rgb_' + filename.rsplit('.', 1)[0] + '.png'
+            rgb_path = os.path.join(PROCESSED_FOLDER, rgb_filename)
+            rgb_result = os.path.join('static/processed', rgb_filename)
             cv2.imwrite(rgb_path, rgb_bgr)
 
             return render_template(
