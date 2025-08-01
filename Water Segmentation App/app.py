@@ -93,7 +93,7 @@ def index():
                 pred_result=pred_path,
                 rgb_result=rgb_path,
             )
-            return render_template("index.html")
+    return render_template("index.html")
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
