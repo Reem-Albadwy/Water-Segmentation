@@ -93,6 +93,7 @@ def index():
                 result=filepath,
                 pred_result=pred_result,
                 rgb_result=rgb_result,
+                download_link=pred_result  
             )
     return render_template("index.html")
 
