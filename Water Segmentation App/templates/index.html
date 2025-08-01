@@ -17,10 +17,6 @@
       margin-bottom: 30px;
     }
 
-    form {
-      margin-bottom: 30px;
-    }
-
     input[type="file"] {
       margin-top: 10px;
       padding: 10px;
@@ -88,7 +84,7 @@
     }
 
     .download-btn {
-      margin-top: 15px;
+      margin-top: 25px;
       display: inline-block;
       padding: 10px 20px;
       background-color: #0096c7;
@@ -130,8 +126,11 @@
     <div class="image-column">
       <p><strong>Detected Water Regions</strong></p>
       <img src="{{ pred_result }}" alt="Predicted Mask">
-      <a href="{{ pred_result }}" class="download-btn" download>⬇ Download Mask</a>
     </div>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <a href="{{ pred_result }}" class="download-btn" download>⬇ Download Mask</a>
   </div>
   {% endif %}
 
