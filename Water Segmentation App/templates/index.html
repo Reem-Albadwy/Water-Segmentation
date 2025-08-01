@@ -5,7 +5,7 @@
   <title>Water Segmentation App 💧</title>
   <style>
     body {
-      background: linear-gradient(120deg, #a1c4fd, #c2e9fb);
+      background: #e8f0fe;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       text-align: center;
       padding: 50px 20px;
@@ -163,18 +163,12 @@
     <p id="loadingText">Processing image... Please wait ⏳</p>
 
     <div class="image-preview-container">
-      {% if rgb_result and true_mask and pred_result %}
+      {% if rgb_result and pred_result %}
 
       <!-- RGB Preview Of Original Image -->
       <div>
         <p><strong>RGB View of Original Image</strong></p>
         <img src="{{ rgb_result }}" alt="RGB Image" class="hidden" onload="this.classList.remove('hidden')">
-      </div>
-
-      <!-- True Mask -->
-      <div>
-        <p><strong>True Mask</strong></p>
-        <img src="{{ true_mask }}" alt="True Mask" class="hidden" onload="this.classList.remove('hidden')">
       </div>
 
       <!-- Predicted Mask -->
@@ -185,7 +179,9 @@
 
       <!-- Accuracy Score -->
       <div style="margin-top: 20px;">
-        <p><strong>Similarity Score:</strong> {{ similarity_score }}%</p>
+        {% if iou_score %}
+        <p><strong>Similarity Score:</strong> {{ iou_score }}%</p>
+        {% endif %}
       </div>
       {% endif %}
     </div>
