@@ -53,7 +53,7 @@ def calculate_iou(true_mask, pred_mask):
     union = np.logical_or(true_mask, pred_mask).sum()
 
     if union == 0:
-        return 100.0 if intersection == 0 else 0.0
+        return 0.0
 
     iou = intersection / union
     return round(iou * 100, 2)
@@ -89,7 +89,9 @@ def index():
 
             # Extract RGB for display
             rgb = img[:, :, [3, 2, 1]]
-            rgb = rgb.astype(np.uint8)
+            rgb = (rgb - np.min(rgb)) / (np.max(rgb) - np.min(rgb))  # min-max scale
+            rgb = (rgb * 255).astype(np.uint8)
+
             rgb_bgr = cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR)
             rgb_path = os.path.join(PROCESSED_FOLDER, 'rgb_image.png')
             cv2.imwrite(rgb_path, rgb_bgr)
@@ -108,7 +110,6 @@ def index():
                 result=filepath,
                 pred_result=pred_path,
                 rgb_result=rgb_path,
-                true_mask=gt_path,
                 iou_score=iou_score
             )
 
