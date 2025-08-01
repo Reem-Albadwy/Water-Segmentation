@@ -91,8 +91,8 @@ def index():
             return render_template(
                 "index.html",
                 result=filepath,
-                pred_result=pred_res,
-                rgb_result=rgb_res,
+                pred_result=pred_result,
+                rgb_result=rgb_result,
             )
     return render_template("index.html")
 
