@@ -45,26 +45,11 @@ def calculate_water_index(img):
     water_index = (G - R) / (G + R + 1e-5)
     return np.expand_dims(water_index, axis=-1)
 
-def calculate_iou(true_mask, pred_mask):
-    true_mask = true_mask.astype(bool)
-    pred_mask = pred_mask.astype(bool)
-
-    intersection = np.logical_and(true_mask, pred_mask).sum()
-    union = np.logical_or(true_mask, pred_mask).sum()
-
-    if union == 0:
-        return 0.0
-
-    iou = intersection / union
-    return round(iou * 100, 2)
-
 @app.route('/', methods=['GET', 'POST'])
 def index():
     result = None
     pred_result = None
     rgb_result = None
-    true_mask = None
-    iou_score = None
 
     if request.method == 'POST':
         file = request.files['image']
@@ -96,24 +81,12 @@ def index():
             rgb_path = os.path.join(PROCESSED_FOLDER, 'rgb_image.png')
             cv2.imwrite(rgb_path, rgb_bgr)
 
-            # Ground truth mask from band 12
-            gt_mask = img[:, :, 11]
-            gt_mask = (gt_mask > 0).astype(np.uint8) * 255
-            gt_path = os.path.join(PROCESSED_FOLDER, 'true_mask.png')
-            cv2.imwrite(gt_path, gt_mask)
-
-            # IoU
-            iou_score = calculate_iou(gt_mask, prediction_resized)
-
             return render_template(
                 "index.html",
                 result=filepath,
                 pred_result=pred_path,
                 rgb_result=rgb_path,
-                iou_score=iou_score
             )
-
-    return render_template("index.html")
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
