@@ -61,7 +61,11 @@ def index():
             img = tiff.imread(filepath)  # (128,128,12)
             water_index = calculate_water_index(img)
             full_img = np.concatenate([img, water_index], axis=-1)  # (128,128,13)
-            input_img = np.expand_dims(full_img, axis=0)  # (1,128,128,13)
+            # Normalize like notebook (per image)
+            min_val = full_img.min(axis=(0, 1), keepdims=True)
+            max_val = full_img.max(axis=(0, 1), keepdims=True)
+            scaled_img = (full_img - min_val) / (max_val - min_val + 1e-8)
+            input_img = np.expand_dims(scaled_img, axis=0)
 
             # Prediction
             prediction = model.predict(input_img)[0]
