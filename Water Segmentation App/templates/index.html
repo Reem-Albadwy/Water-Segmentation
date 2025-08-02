@@ -4,17 +4,37 @@
   <meta charset="UTF-8">
   <title>Water Segmentation App 💧</title>
   <style>
+    :root {
+      --bg-color: #0f172a;
+      --text-color: #e2f1ff;
+      --accent: #38bdf8;
+      --button-bg: #0ea5e9;
+      --button-hover: #0284c7;
+      --progress-bg: #1e293b;
+      --progress-fill: #38bdf8;
+    }
+    [data-theme="light"] {
+      --bg-color: #f8fafc;
+      --text-color: #0f172a;
+      --accent: #0284c7;
+      --button-bg: #0284c7;
+      --button-hover: #0369a1;
+      --progress-bg: #e2e8f0;
+      --progress-fill: #0284c7;
+    }
+
     body {
-      background: #0f172a; /* Dark blue-gray tone */
+      background: var(--bg-color);
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       text-align: center;
       padding: 50px 20px;
       margin: 0;
-      color: #e2f1ff;
+      color: var(--text-color);
+      transition: background 0.4s ease, color 0.4s ease;
     }
 
     h1 {
-      color: #38bdf8;
+      color: var(--accent);
       margin-bottom: 20px;
       font-size: 2.5em;
     }
@@ -28,16 +48,16 @@
     input[type="file"] {
       margin-top: 10px;
       padding: 10px;
-      background-color: #1e293b;
+      background-color: var(--progress-bg);
       border: 1px solid #334155;
       border-radius: 6px;
-      color: #e2f1ff;
+      color: var(--text-color);
     }
 
     button {
       margin: 20px 10px;
       padding: 12px 30px;
-      background-color: #0ea5e9;
+      background-color: var(--button-bg);
       color: white;
       border: none;
       border-radius: 8px;
@@ -48,7 +68,7 @@
     }
 
     button:hover {
-      background-color: #0284c7;
+      background-color: var(--button-hover);
     }
 
     .spinner {
@@ -57,7 +77,7 @@
       width: 50px;
       height: 50px;
       border: 6px solid #334155;
-      border-top: 6px solid #38bdf8;
+      border-top: 6px solid var(--accent);
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
@@ -69,7 +89,7 @@
 
     #loadingText {
       display: none;
-      color: #7dd3fc;
+      color: var(--accent);
       font-weight: bold;
       margin-top: 10px;
     }
@@ -78,7 +98,7 @@
       width: 60%;
       margin: 20px auto;
       height: 20px;
-      background-color: #1e293b;
+      background-color: var(--progress-bg);
       border-radius: 10px;
       overflow: hidden;
     }
@@ -86,7 +106,7 @@
     .progress-fill {
       height: 100%;
       width: 0%;
-      background-color: #38bdf8;
+      background-color: var(--progress-fill);
       transition: width 1.5s ease;
     }
 
@@ -103,7 +123,7 @@
       max-height: 300px;
       border-radius: 12px;
       box-shadow: 0 0 15px rgba(0,0,0,0.3);
-      transition: opacity 0.5s ease-in-out;
+      transition: opacity 1s ease-in-out, filter 2s ease-in-out;
     }
 
     .image-column {
@@ -114,7 +134,7 @@
       margin-top: 25px;
       display: inline-block;
       padding: 10px 20px;
-      background-color: #0ea5e9;
+      background-color: var(--button-bg);
       color: white;
       border-radius: 6px;
       text-decoration: none;
@@ -122,13 +142,26 @@
     }
 
     .download-btn:hover {
-      background-color: #0284c7;
+      background-color: var(--button-hover);
     }
 
     .footer-note {
       font-size: 14px;
       margin-top: 30px;
       color: #64748b;
+    }
+
+    .theme-toggle {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      background: none;
+      border: 2px solid var(--accent);
+      color: var(--accent);
+      padding: 8px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
     }
 
     @media (max-width: 768px) {
@@ -139,7 +172,8 @@
     }
   </style>
 </head>
-<body>
+<body data-theme="dark">
+  <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
   <h1>Water Segmentation App 💧</h1>
   <p class="note">Supports TIFF images - Model: U-Net 💡</p>
 
@@ -155,7 +189,9 @@
   <div class="spinner" id="loadingSpinner"></div>
   <p id="loadingText">Processing image... Please wait ⏳</p>
 
-  {% if rgb_result and pred_result %}
+  <audio id="doneSound" src="static/done.mp3" preload="auto"></audio>
+
+  {% if rgb_result and pred_result and overlay_result %}
   <div class="image-preview-container">
     <div class="image-column">
       <p><strong>Original Image</strong></p>
@@ -163,12 +199,18 @@
     </div>
     <div class="image-column">
       <p><strong>Predicted Water Regions</strong></p>
-      <img src="{{ pred_result }}" alt="Predicted Mask">
+      <img src="{{ pred_result }}" alt="Predicted Mask" style="filter: brightness(1.1) contrast(1.2);">
+    </div>
+    <div class="image-column">
+      <p><strong>Overlay View</strong></p>
+      <img src="{{ overlay_result }}" alt="Overlay Image">
     </div>
   </div>
 
-  <h2 style="margin-top: 30px; color: #38bdf8;">Water Coverage: {{ coverage_percent }}%</h2>
+  <h2 style="margin-top: 30px; color: var(--accent);">Water Coverage: {{ coverage_percent }}%</h2>
   <a href="{{ pred_result }}" class="download-btn" download>⬇ Download Mask</a>
+  <a href="{{ pdf_report_url }}" class="download-btn" download>📄 Download PDF Report</a>
+  <script>document.getElementById("doneSound").play();</script>
   {% endif %}
 
   <div class="footer-note">Built using U-Net | Image format: .tif/.tiff supported</div>
@@ -177,11 +219,19 @@
     function startProcessing() {
       document.getElementById("loadingSpinner").style.display = "block";
       document.getElementById("loadingText").style.display = "block";
-      document.getElementById("progressFill").style.width = "60%";
+      document.getElementById("progressFill").style.width = "80%";
     }
+
     function reprocess() {
       window.location.reload();
+    }
+
+    function toggleTheme() {
+      const body = document.body;
+      const current = body.getAttribute('data-theme');
+      body.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
     }
   </script>
 </body>
 </html>
+
