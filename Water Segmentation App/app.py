@@ -5,12 +5,9 @@ import requests
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.layers import Dropout
-from tensorflow.keras.utils import get_custom_objects
 from tensorflow.keras.activations import swish
-from PIL import Image
-from tensorflow.keras.preprocessing.image import load_img, img_to_array
-import cv2
 import tifffile as tiff
+import cv2
 
 app = Flask(__name__)
 
@@ -45,11 +42,16 @@ def calculate_water_index(img):
     water_index = (G - R) / (G + R + 1e-5)
     return np.expand_dims(water_index, axis=-1)
 
+def calculate_coverage(mask):
+    total_pixels = mask.shape[0] * mask.shape[1]
+    water_pixels = np.sum(mask > 127)
+    return round((water_pixels / total_pixels) * 100, 2)
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    result = None
     pred_result = None
     rgb_result = None
+    coverage_percent = None
 
     if request.method == 'POST':
         file = request.files['image']
@@ -58,16 +60,15 @@ def index():
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
 
-            img = tiff.imread(filepath)  # (128,128,12)
+            img = tiff.imread(filepath)
             water_index = calculate_water_index(img)
-            full_img = np.concatenate([img, water_index], axis=-1)  # (128,128,13)
-            # Normalize like notebook (per image)
+            full_img = np.concatenate([img, water_index], axis=-1)
+
             min_val = full_img.min(axis=(0, 1), keepdims=True)
             max_val = full_img.max(axis=(0, 1), keepdims=True)
             scaled_img = (full_img - min_val) / (max_val - min_val + 1e-8)
             input_img = np.expand_dims(scaled_img, axis=0)
 
-            # Prediction
             prediction = model.predict(input_img)[0]
             prediction_binary = (prediction > 0.5).astype(np.uint8) * 255
             prediction_resized = cv2.resize(prediction_binary, (128, 128))
@@ -77,12 +78,13 @@ def index():
             pred_path = os.path.join(PREDICTED_FOLDER, pred_filename)
             cv2.imwrite(pred_path, prediction_resized)
 
-            # Extract RGB for display
-            rgb = img[:, :, [3, 2, 1]]
-            rgb = (rgb - np.min(rgb)) / (np.max(rgb) - np.min(rgb))  # min-max scale
-            rgb = (rgb * 255).astype(np.uint8)
+            coverage_percent = calculate_coverage(prediction_resized)
 
+            rgb = img[:, :, [3, 2, 1]]
+            rgb = (rgb - np.min(rgb)) / (np.max(rgb) - np.min(rgb))
+            rgb = (rgb * 255).astype(np.uint8)
             rgb_bgr = cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR)
+
             rgb_filename = 'rgb_' + filename.rsplit('.', 1)[0] + '.png'
             rgb_path = os.path.join(PROCESSED_FOLDER, rgb_filename)
             rgb_result = os.path.join('static/processed', rgb_filename)
@@ -90,11 +92,11 @@ def index():
 
             return render_template(
                 "index.html",
-                result=filepath,
                 pred_result=pred_result,
                 rgb_result=rgb_result,
-                download_link=pred_result  
+                coverage_percent=coverage_percent
             )
+
     return render_template("index.html")
 
 if __name__ == '__main__':
