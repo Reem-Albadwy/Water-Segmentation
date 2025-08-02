@@ -61,7 +61,7 @@ def generate_pdf(original_path, mask_path, overlay_path, percentage, output_path
     pdf.add_page()
     pdf.set_font("Arial", size=12)
 
-    pdf.cell(200, 10, txt="Water Segmentation Report 💧", ln=True, align='C')
+    pdf.cell(200, 10, txt="Water Segmentation Report ", ln=True, align='C')
     pdf.ln(10)
     pdf.cell(200, 10, txt=f"Water Coverage: {percentage}%", ln=True)
     pdf.cell(200, 10, txt=f"Date: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", ln=True)
@@ -146,3 +146,4 @@ def index():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+
