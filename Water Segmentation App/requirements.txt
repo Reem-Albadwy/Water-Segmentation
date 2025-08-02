@@ -6,4 +6,6 @@ opencv-python-headless
 gunicorn
 Pillow
 tifffile
+fpdf
+
 
