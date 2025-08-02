@@ -175,7 +175,7 @@
 <body data-theme="dark">
   <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
   <h1>Water Segmentation App 💧</h1>
-  <p class="note">Supports TIFF images - Model: U-Net 💡</p>
+  <p class="note">Supports TIFF images - Model: U-Net </p>
 
   <form method="POST" enctype="multipart/form-data" onsubmit="startProcessing()">
     <input type="file" name="image" accept="image/*,.tif,.tiff" required><br>
@@ -189,7 +189,7 @@
   <div class="spinner" id="loadingSpinner"></div>
   <p id="loadingText">Processing image... Please wait ⏳</p>
 
-  <audio id="doneSound" src="static/done.mp3" preload="auto"></audio>
+  <audio id="doneSound" src="static/sound/done.mp3" preload="auto"></audio>
 
   {% if rgb_result and pred_result and overlay_result %}
   <div class="image-preview-container">
@@ -234,4 +234,5 @@
   </script>
 </body>
 </html>
+
 
