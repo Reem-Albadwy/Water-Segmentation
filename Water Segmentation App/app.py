@@ -51,7 +51,7 @@ def calculate_coverage(mask):
 
 def generate_overlay(rgb_img, mask):
     mask_colored = np.zeros_like(rgb_img)
-    mask_colored[:, :, 0] = mask 
+    mask_colored[:, :, 2] = mask 
 
     overlay = cv2.addWeighted(rgb_img, 0.75, mask_colored, 0.25, 0)
     return overlay
@@ -146,6 +146,7 @@ def index():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+
 
 
 
