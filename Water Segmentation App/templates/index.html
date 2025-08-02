@@ -189,7 +189,7 @@
   <div class="spinner" id="loadingSpinner"></div>
   <p id="loadingText">Processing image... Please wait ⏳</p>
 
-  <audio id="doneSound" src="static/sound/done.mp3" preload="auto"></audio>
+  <audio id="doneSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" preload="auto"></audio>
 
   {% if rgb_result and pred_result and overlay_result %}
   <div class="image-preview-container">
@@ -210,7 +210,6 @@
   <h2 style="margin-top: 30px; color: var(--accent);">Water Coverage: {{ coverage_percent }}%</h2>
   <a href="{{ pred_result }}" class="download-btn" download>⬇ Download Mask</a>
   <a href="{{ pdf_report_url }}" class="download-btn" download>📄 Download PDF Report</a>
-  <script>document.getElementById("doneSound").play();</script>
   {% endif %}
 
   <div class="footer-note">Built using U-Net | Image format: .tif/.tiff supported</div>
@@ -220,6 +219,7 @@
       document.getElementById("loadingSpinner").style.display = "block";
       document.getElementById("loadingText").style.display = "block";
       document.getElementById("progressFill").style.width = "80%";
+      sessionStorage.setItem("playSound", "yes");
     }
 
     function reprocess() {
@@ -230,9 +230,20 @@
       const body = document.body;
       const current = body.getAttribute('data-theme');
       body.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
-    }
+      }
+
+      window.onload = function () {
+        if (sessionStorage.getItem("playSound") === "yes") {
+          const audio = document.getElementById("doneSound");
+          audio.play().catch((err) => {
+            console.warn("Autoplay blocked:", err);
+          });
+          sessionStorage.removeItem("playSound");
+        }
+      }
   </script>
 </body>
 </html>
+
 
 
